@@ -6,6 +6,8 @@ import cz.uhk.veditor.grobjekty.Square;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,8 +15,10 @@ import java.util.List;
  * Hlavni okno aplikace
  */
 public class MainWindow extends JFrame {
-
     private List<AbstractGeomObject> objekty = new ArrayList<>();
+    private JToolBar toolbar;
+    private JToggleButton btSquare;
+    private JToggleButton btCircle;
 
     public MainWindow() {
         super("Vektorový editor");
@@ -22,10 +26,39 @@ public class MainWindow extends JFrame {
 
         initTestData();
 
-        add(new GraphPanel(objekty), BorderLayout.CENTER);
+        createToolbar();
+
+        GraphPanel graphPanel = new GraphPanel(objekty);
+        add(graphPanel, BorderLayout.CENTER);
+        graphPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    if (btSquare.isSelected()) {
+                        objekty.add(new Square(e.getPoint(), 10, Color.RED));
+                    }
+                    if (btCircle.isSelected()) {
+                        objekty.add(new Circle(e.getPoint(), 50, Color.BLUE));
+                    }
+                    graphPanel.repaint();
+                }
+            }
+        });
 
         setSize(800, 600);
         setLocationRelativeTo(null);
+    }
+
+    private void createToolbar() {
+        toolbar = new JToolBar(JToolBar.HORIZONTAL);
+        btSquare = new JToggleButton("Ctverec", new ImageIcon(getClass().getResource("/ctverec.png")));
+        btCircle = new JToggleButton("Kruznice", new ImageIcon(getClass().getResource("/kolecko.png")));
+        toolbar.add(btSquare);
+        toolbar.add(btCircle);
+        ButtonGroup group = new ButtonGroup();
+        group.add(btSquare);
+        group.add(btCircle);
+        add(toolbar, BorderLayout.NORTH);
     }
 
     private void initTestData() {
