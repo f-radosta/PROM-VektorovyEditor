@@ -2,7 +2,9 @@ package cz.uhk.veditor.gui;
 
 import cz.uhk.veditor.grobjekty.AbstractGeomObject;
 import cz.uhk.veditor.grobjekty.Circle;
+import cz.uhk.veditor.grobjekty.Rectangle;
 import cz.uhk.veditor.grobjekty.Square;
+import cz.uhk.veditor.grobjekty.Triangle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,6 +22,8 @@ public class MainWindow extends JFrame {
     private JToolBar toolbar;
     private JToggleButton btSquare;
     private JToggleButton btCircle;
+    private JToggleButton btTriangle;
+    private JToggleButton btRectangle;
     private JToggleButton btSelect;
     private AbstractGeomObject selectedObject = null;
     private Point lastMousePosition = null;
@@ -38,11 +42,18 @@ public class MainWindow extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1) {
+                    AbstractGeomObject obj = null;
                     if (btSquare.isSelected()) {
-                        objekty.add(new Square(e.getPoint(), 10, Color.RED));
-                        graphPanel.repaint();
+                        obj = new Square(e.getPoint(), 10, Color.RED);
                     } else if (btCircle.isSelected()) {
-                        objekty.add(new Circle(e.getPoint(), 50, Color.BLUE));
+                        obj = new Circle(e.getPoint(), 50, Color.BLUE);
+                    } else if (btTriangle.isSelected()) {
+                        obj = new Triangle(e.getPoint(), 50, Color.GREEN);
+                    } else if (btRectangle.isSelected()) {
+                        obj = new Rectangle(e.getPoint(), 80, 40, Color.ORANGE);
+                    }
+                    if (obj != null) {
+                        objekty.add(obj);
                         graphPanel.repaint();
                     }
                 }
@@ -99,17 +110,23 @@ public class MainWindow extends JFrame {
         btSelect = new JToggleButton("Výběr", new ImageIcon(getClass().getResource("/sipka.png")));
         btSelect.setToolTipText("Nástroj pro výběr a přesun objektů");
         
-        btSquare = new JToggleButton("Ctverec", new ImageIcon(getClass().getResource("/ctverec.png")));
-        btCircle = new JToggleButton("Kruznice", new ImageIcon(getClass().getResource("/kolecko.png")));
+        btSquare = new JToggleButton("Čtverec", new ImageIcon(getClass().getResource("/ctverec.png")));
+        btCircle = new JToggleButton("Kružnice", new ImageIcon(getClass().getResource("/kolecko.png")));
+        btTriangle = new JToggleButton("Trojúhelník", new ImageIcon(getClass().getResource("/trojuhelnik.png")));
+        btRectangle = new JToggleButton("Obdélník", new ImageIcon(getClass().getResource("/obdelnik.png")));
         
         toolbar.add(btSelect);
         toolbar.add(btSquare);
         toolbar.add(btCircle);
+        toolbar.add(btTriangle);
+        toolbar.add(btRectangle);
         
         ButtonGroup group = new ButtonGroup();
         group.add(btSelect);
         group.add(btSquare);
         group.add(btCircle);
+        group.add(btTriangle);
+        group.add(btRectangle);
         
         btSelect.setSelected(true);
         
@@ -124,5 +141,8 @@ public class MainWindow extends JFrame {
         objekty.add(new Square(new Point(200,600),40,Color.MAGENTA));
         objekty.add(new Circle(new Point(300,300),70,Color.ORANGE));
         objekty.add(new Square(new Point(600,400),30,Color.BLACK));
+        objekty.add(new Triangle(new Point(400,400),100,Color.CYAN));
+        objekty.add(new Triangle(new Point(300,300),100,Color.MAGENTA));
+        objekty.add(new Rectangle(new Point(500,200),120,60,Color.ORANGE));
     }
 }
