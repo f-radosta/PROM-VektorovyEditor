@@ -2,27 +2,33 @@ package cz.uhk.veditor.grobjekty;
 
 import java.awt.*;
 
-public class Square extends AbstractGeomObject {
-    protected int a;
+public class Circle extends AbstractGeomObject {
+    protected int radius;
 
-    public Square(Point position, int a, Color color) {
+    public Circle(Point position, int radius, Color color) {
         super(position, color);
-        this.a = a;
+        this.radius = radius;
     }
 
-    public Square(int a) {
-        this.a = a;
+    public Circle(int radius) {
+        this.radius = radius;
     }
 
     @Override
     public boolean contains(int x, int y) {
-        return x >= position.x && x <= position.x + a
-                && y >= position.y && y <= position.y + a;
+        //(x - m)^2 + (y - n)^2 = r2
+        int m = position.x + radius;
+        int n = position.y + radius;
+
+        int l = (x - m) * (x - m) + (y - n) * (y - n);
+        int r = radius * radius;
+
+        return l <= r;
     }
 
     @Override
     public void draw(Graphics2D g) {
         g.setColor(color);
-        g.drawRect(position.x, position.y, a, a);
+        g.drawOval(position.x, position.y, 2*radius, 2*radius);
     }
 }
