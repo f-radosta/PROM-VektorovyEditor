@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,9 @@ public class MainWindow extends JFrame {
     private JToolBar toolbar;
     private JToggleButton btSquare;
     private JToggleButton btCircle;
+    private JToggleButton btSelect;
+    private AbstractGeomObject selectedObject = null;
+    private Point lastMousePosition = null;
 
     public MainWindow() {
         super("Vektorový editor");
@@ -36,10 +40,50 @@ public class MainWindow extends JFrame {
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     if (btSquare.isSelected()) {
                         objekty.add(new Square(e.getPoint(), 10, Color.RED));
-                    }
-                    if (btCircle.isSelected()) {
+                        graphPanel.repaint();
+                    } else if (btCircle.isSelected()) {
                         objekty.add(new Circle(e.getPoint(), 50, Color.BLUE));
+                        graphPanel.repaint();
                     }
+                }
+            }
+            
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1 && btSelect.isSelected()) {
+                    selectedObject = null;
+                    for (int i = objekty.size() - 1; i >= 0; i--) {
+                        AbstractGeomObject obj = objekty.get(i);
+                        if (obj.contains(e.getX(), e.getY())) {
+                            selectedObject = obj;
+                            lastMousePosition = e.getPoint();
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1 && btSelect.isSelected()) {
+                    selectedObject = null;
+                    lastMousePosition = null;
+                }
+            }
+        });
+        
+        graphPanel.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (btSelect.isSelected() && selectedObject != null && lastMousePosition != null) {
+                    int dx = e.getX() - lastMousePosition.x;
+                    int dy = e.getY() - lastMousePosition.y;
+                    
+                    Point currentPos = selectedObject.getPosition();
+                    selectedObject.setPosition(currentPos.x + dx, currentPos.y + dy);
+                    
+                    lastMousePosition = e.getPoint();
+                    
                     graphPanel.repaint();
                 }
             }
@@ -51,13 +95,24 @@ public class MainWindow extends JFrame {
 
     private void createToolbar() {
         toolbar = new JToolBar(JToolBar.HORIZONTAL);
+        
+        btSelect = new JToggleButton("Výběr", new ImageIcon(getClass().getResource("/sipka.png")));
+        btSelect.setToolTipText("Nástroj pro výběr a přesun objektů");
+        
         btSquare = new JToggleButton("Ctverec", new ImageIcon(getClass().getResource("/ctverec.png")));
         btCircle = new JToggleButton("Kruznice", new ImageIcon(getClass().getResource("/kolecko.png")));
+        
+        toolbar.add(btSelect);
         toolbar.add(btSquare);
         toolbar.add(btCircle);
+        
         ButtonGroup group = new ButtonGroup();
+        group.add(btSelect);
         group.add(btSquare);
         group.add(btCircle);
+        
+        btSelect.setSelected(true);
+        
         add(toolbar, BorderLayout.NORTH);
     }
 
